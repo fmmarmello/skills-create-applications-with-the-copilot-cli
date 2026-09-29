@@ -8,6 +8,9 @@ const {
   subtraction,
   multiplication,
   division,
+  modulo,
+  power,
+  squareRoot,
   calculate,
 } = require("../calculator.js");
 const calculatorPath = path.join(__dirname, "..", "calculator.js");
@@ -31,6 +34,33 @@ test("division function divides the first value by the second", () => {
 test("division function rejects division by zero", () => {
   assert.throws(() => division("20", "0"), {
     message: "Não é possível dividir por zero.",
+  });
+});
+
+test("modulo function computes the remainder of a standard division", () => {
+  assert.equal(modulo("10", "3"), 1);
+  assert.equal(modulo("20", "5"), 0);
+});
+
+test("modulo function rejects division by zero", () => {
+  assert.throws(() => modulo("10", "0"), {
+    message: "Não é possível dividir por zero.",
+  });
+});
+
+test("power function raises the base to the exponent", () => {
+  assert.equal(power("2", "3"), 8);
+  assert.equal(power("5", "2"), 25);
+});
+
+test("square root function returns the root for positive values", () => {
+  assert.equal(squareRoot("9"), 3);
+  assert.equal(squareRoot("16"), 4);
+});
+
+test("square root function rejects negative values", () => {
+  assert.throws(() => squareRoot("-4"), {
+    message: "Não é possível calcular a raiz quadrada de um número negativo.",
   });
 });
 
@@ -90,9 +120,18 @@ test("validation: rejects non-numeric and non-finite values", () => {
   }
 });
 
+test("validation: supports modulo, power, and square root operations", () => {
+  assert.equal(calculate("10", "%", "3"), 1);
+  assert.equal(calculate("2", "^", "3"), 8);
+  assert.equal(calculate("9", "sqrt", undefined), 3);
+  assert.throws(() => calculate("-4", "sqrt", undefined), {
+    message: "Não é possível calcular a raiz quadrada de um número negativo.",
+  });
+});
+
 test("validation: rejects unsupported operators", () => {
-  assert.throws(() => calculate("2", "%", "3"), {
-    message: "Operador inválido. Use +, -, * ou /.",
+  assert.throws(() => calculate("2", "?", "3"), {
+    message: "Operador inválido. Use +, -, *, /, %, ^ ou sqrt.",
   });
 });
 
@@ -118,6 +157,16 @@ test("CLI: prints usage for --help and -h", () => {
     assert.match(result.stdout, /Operadores: \+ \(adição\)/);
     assert.equal(result.stderr, "");
   }
+});
+
+test("CLI: supports square root calculations", () => {
+  const result = spawnSync(process.execPath, [calculatorPath, "9", "sqrt"], {
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout.trim(), "3");
+  assert.equal(result.stderr, "");
 });
 
 test("CLI: reports an error for missing arguments", () => {

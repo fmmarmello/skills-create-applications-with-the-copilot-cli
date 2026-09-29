@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-// Operações suportadas: adição (+), subtração (-), multiplicação (*) e divisão (/).
+// Operações suportadas: adição (+), subtração (-), multiplicação (*), divisão (/),
+// modulo (%), potência (^), e raiz quadrada (sqrt).
 function parseOperands(firstValue, secondValue) {
   const firstNumber = parseOperand(firstValue);
   const secondNumber = parseOperand(secondValue);
@@ -45,7 +46,40 @@ function division(firstValue, secondValue) {
   return firstNumber / secondNumber;
 }
 
+function modulo(firstValue, secondValue) {
+  const [firstNumber, secondNumber] = parseOperands(firstValue, secondValue);
+  if (secondNumber === 0) {
+    throw new Error("Não é possível dividir por zero.");
+  }
+  return firstNumber % secondNumber;
+}
+
+function power(base, exponent) {
+  const [baseNumber, exponentNumber] = parseOperands(base, exponent);
+  return Math.pow(baseNumber, exponentNumber);
+}
+
+function squareRoot(value) {
+  const number = parseOperand(value);
+  if (number < 0) {
+    throw new Error("Não é possível calcular a raiz quadrada de um número negativo.");
+  }
+  return Math.sqrt(number);
+}
+
 function calculate(firstValue, operator, secondValue) {
+  if (operator === "sqrt" || operator === "√") {
+    return squareRoot(firstValue);
+  }
+
+  if (operator === "%") {
+    return modulo(firstValue, secondValue);
+  }
+
+  if (operator === "^") {
+    return power(firstValue, secondValue);
+  }
+
   parseOperands(firstValue, secondValue);
 
   switch (operator) {
@@ -58,19 +92,30 @@ function calculate(firstValue, operator, secondValue) {
     case "/":
       return division(firstValue, secondValue);
     default:
-      throw new Error("Operador inválido. Use +, -, * ou /.");
+      throw new Error("Operador inválido. Use +, -, *, /, %, ^ ou sqrt.");
   }
 }
 
 function printUsage() {
   console.log("Uso: node src/calculator.js <número> <operador> <número>");
-  console.log("Operadores: + (adição), - (subtração), * (multiplicação), / (divisão)");
+  console.log("Operadores: + (adição), - (subtração), * (multiplicação), / (divisão), % (módulo), ^ (potência), sqrt (raiz quadrada)");
   console.log('Exemplo: node src/calculator.js 10 "+" 5');
+  console.log('Exemplo: node src/calculator.js 9 sqrt');
 }
 
 function main(args) {
   if (args.length === 1 && (args[0] === "--help" || args[0] === "-h")) {
     printUsage();
+    return;
+  }
+
+  if (args.length === 2 && (args[1] === "sqrt" || args[1] === "√")) {
+    try {
+      console.log(squareRoot(args[0]));
+    } catch (error) {
+      console.error(error.message);
+      process.exitCode = 1;
+    }
     return;
   }
 
@@ -92,4 +137,13 @@ if (require.main === module) {
   main(process.argv.slice(2));
 }
 
-module.exports = { addition, subtraction, multiplication, division, calculate };
+module.exports = {
+  addition,
+  subtraction,
+  multiplication,
+  division,
+  modulo,
+  power,
+  squareRoot,
+  calculate,
+};
