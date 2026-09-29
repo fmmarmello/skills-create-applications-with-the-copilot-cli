@@ -3,8 +3,36 @@ const { spawnSync } = require("node:child_process");
 const path = require("node:path");
 const test = require("node:test");
 
-const { calculate } = require("../calculator.js");
+const {
+  addition,
+  subtraction,
+  multiplication,
+  division,
+  calculate,
+} = require("../calculator.js");
 const calculatorPath = path.join(__dirname, "..", "calculator.js");
+
+test("addition function adds two values", () => {
+  assert.equal(addition("2", "3"), 5);
+});
+
+test("subtraction function subtracts the second value from the first", () => {
+  assert.equal(subtraction("10", "4"), 6);
+});
+
+test("multiplication function multiplies two values", () => {
+  assert.equal(multiplication("45", "2"), 90);
+});
+
+test("division function divides the first value by the second", () => {
+  assert.equal(division("20", "5"), 4);
+});
+
+test("division function rejects division by zero", () => {
+  assert.throws(() => division("20", "0"), {
+    message: "Não é possível dividir por zero.",
+  });
+});
 
 test("addition: example from the image (2 + 3)", () => {
   assert.equal(calculate("2", "+", "3"), 5);

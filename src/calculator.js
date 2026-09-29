@@ -1,31 +1,62 @@
 #!/usr/bin/env node
 
 // Operações suportadas: adição (+), subtração (-), multiplicação (*) e divisão (/).
-function calculate(firstValue, operator, secondValue) {
-  const firstNumber = Number(firstValue);
-  const secondNumber = Number(secondValue);
+function parseOperands(firstValue, secondValue) {
+  const firstNumber = parseOperand(firstValue);
+  const secondNumber = parseOperand(secondValue);
+  return [firstNumber, secondNumber];
+}
 
+function parseOperand(value) {
   if (
-    firstValue.trim() === "" ||
-    secondValue.trim() === "" ||
-    !Number.isFinite(firstNumber) ||
-    !Number.isFinite(secondNumber)
+    (typeof value !== "string" && typeof value !== "number") ||
+    (typeof value === "string" && value.trim() === "")
   ) {
     throw new Error("Informe dois números válidos.");
   }
 
+  const number = Number(value);
+  if (!Number.isFinite(number)) {
+    throw new Error("Informe dois números válidos.");
+  }
+  return number;
+}
+
+function addition(firstValue, secondValue) {
+  const [firstNumber, secondNumber] = parseOperands(firstValue, secondValue);
+  return firstNumber + secondNumber;
+}
+
+function subtraction(firstValue, secondValue) {
+  const [firstNumber, secondNumber] = parseOperands(firstValue, secondValue);
+  return firstNumber - secondNumber;
+}
+
+function multiplication(firstValue, secondValue) {
+  const [firstNumber, secondNumber] = parseOperands(firstValue, secondValue);
+  return firstNumber * secondNumber;
+}
+
+function division(firstValue, secondValue) {
+  const [firstNumber, secondNumber] = parseOperands(firstValue, secondValue);
+  if (secondNumber === 0) {
+    throw new Error("Não é possível dividir por zero.");
+  }
+  return firstNumber / secondNumber;
+}
+
+function calculate(firstValue, operator, secondValue) {
+  parseOperands(firstValue, secondValue);
+
   switch (operator) {
     case "+":
-      return firstNumber + secondNumber;
+      return addition(firstValue, secondValue);
     case "-":
-      return firstNumber - secondNumber;
+      return subtraction(firstValue, secondValue);
     case "*":
-      return firstNumber * secondNumber;
+      return multiplication(firstValue, secondValue);
     case "/":
-      if (secondNumber === 0) {
-        throw new Error("Não é possível dividir por zero.");
-      }
-      return firstNumber / secondNumber;
+      return division(firstValue, secondValue);
     default:
       throw new Error("Operador inválido. Use +, -, * ou /.");
   }
@@ -61,4 +92,4 @@ if (require.main === module) {
   main(process.argv.slice(2));
 }
 
-module.exports = { calculate };
+module.exports = { addition, subtraction, multiplication, division, calculate };
